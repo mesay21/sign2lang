@@ -49,3 +49,26 @@ def normalize(image):
     image = (image - imagenet_mean) / imagenet_std
 
     return image
+
+
+def parse_video(example_proto):
+    '''Parse a tfrecord file containing videos and return a normalized video array.
+    Args:
+        example_proto--> tf.train.Example protocol buffer message
+    Retruns:
+        video--> N-D tensor containing the video frames (#F x H x W x C)
+    '''
+
+    video_features = {
+        'num_frames': tf.io.FixedLenFeature([], tf.int64),
+        'label': tf.io.FixedLenFeature([], tf.int64),
+        'frames': tf.io.VarLenFeature(tf.string),
+    }
+
+    parse_features = parse_example(example_proto, video_features)
+    frames = parse_features['frames']
+    video = tf.map_fn(lambda x: decode_image(x),
+                      frames.values, dtype=tf.uint8)
+    video = tf.map_fn(lambda x: normalize(x), video, dtype=tf.float32)
+    
+    return video
