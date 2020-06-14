@@ -19,13 +19,13 @@ def parse_example(example_proto, features):
     return tf.io.parse_single_example(example_proto, features)
 
 
-def decode_image(x):
+def decode_image(encoded_image):
     '''Decode an image from a string.
     Args:
-        x--> JPEG encoded string tensor
+        encoded_image--> JPEG encoded string tensor
     returns-->
         image--> JPEG decoded image tensor
     '''
-    img = tf.io.decode_jpeg(x)
+    img = tf.io.decode_jpeg(encoded_image)
     img.set_shape((256, 256, 3))
     return decode_image
