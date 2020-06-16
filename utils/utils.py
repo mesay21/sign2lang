@@ -190,3 +190,33 @@ def shuffle_data(data, label):
     data, label = zip(*dataset)
 
     return data, label
+
+
+def get_file_list(file_path, meta_file, file_type='.tfrecords'):
+    '''Create the dataset from meta files. The meta file is expected to contain
+    a dictionary with keys 'video_id' (which has a list of filenames) and 
+    'label'(which has a list of label corresponding to the files).
+    Args:
+        file_path--> directory where the files are stored.
+        meta_dir--> directory where meta files are stored.
+        file_type--> video file extension (e.g .mp4, .avi)
+    Retruns:
+        dataset--> a dictionary containing path to training, validation,
+            and test files and corresponding labels.    
+    '''
+
+    # Read meta files
+    meta_file = read_json(meta_file)
+
+    data = [os.path.join(file_path, '{}{}'.format(instance['video_id'], file_type))
+            for instance in meta_file]
+    label = [instance['label'] for instance in meta_file]
+    
+    assert len(data) == len(label), "data and label size mismatch"
+
+    data, label = shuffle_data(data, label)
+
+    data = np.array(data)
+    label = np.array(label, dtype=np.int32)
+
+    return data, label
