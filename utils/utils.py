@@ -101,3 +101,16 @@ def get_random_frames(frames, num_classes, label=None, num_frames=20):
     sampled_frames = np.stack([frames[i] for i in index[:num_frames]], axis=0)
     
     return sampled_frames, tf.one_hot(label, num_classes, dtype=tf.float32)
+
+
+def random_flip(video):
+    '''Horizontaly flip a video 
+    Args:
+        video--> 4D array of video
+    Returns:
+        horizontaly flipped video
+    '''
+    if random.random() < 0.5:
+        return video[:, :, ::-1, :]
+
+    return video
