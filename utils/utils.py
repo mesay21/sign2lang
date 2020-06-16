@@ -220,3 +220,29 @@ def get_file_list(file_path, meta_file, file_type='.tfrecords'):
     label = np.array(label, dtype=np.int32)
 
     return data, label
+
+
+def read_video(video_path, dim=(256, 256)):
+    ''' Read a video file from a given path and return it as a numpy array.
+    Args:
+        video_path--> path to the video file (string)
+        dim--> the new height and with of the video/frames.
+    Returns:
+        data--> 4D array containing all the frames in the video    
+    '''
+
+    capture = cv2.VideoCapture(video_path)
+    frames = []
+
+    while (capture.isOpened()):
+        success, frame = capture.read()
+
+        if not success:
+            break
+
+        if dim is not None:
+            frame = cv2.resize(frame, dim)
+        frames.append(np.array(frame))
+
+    capture.release()
+    return np.asarray(frames)
