@@ -72,3 +72,32 @@ def parse_video(example_proto):
     video = tf.map_fn(lambda x: normalize(x), video, dtype=tf.float32)
     
     return video
+
+
+def get_random_frames(frames, num_classes, label=None, num_frames=20):
+    '''Given a numpy array for a video frame, sample frames 
+        without loosing temporal sequence.
+    Args:
+        frames--> 4D array of frames
+        num_classes--> number of classes (int)
+        num_frames--> number of frames to select
+        label--> class label of the video
+    Retruns:
+        sampled_frames--> 4D array frames
+        label--> one-hot encoded label of the video
+    '''
+    if (len(frames) < num_frames):
+        # If the number of frames is less than the required number of frames,
+        # append frames with zero values.
+        append_shape = [num_frames - len(frames)] + list(frames.shape[1:])
+        zeros_array = np.zeros(shape=append_shape)
+        frames = np.concatenate((frames, zeros_array), axis=0)
+        assert len(frames) == num_frames
+
+        return frames, tf.one_hot(label, num_classes, dtype=tf.float32)
+
+    rate = len(frames)//num_frames
+    index = np.arange(0, len(frames), rate)
+    sampled_frames = np.stack([frames[i] for i in index[:num_frames]], axis=0)
+    
+    return sampled_frames, tf.one_hot(label, num_classes, dtype=tf.float32)
