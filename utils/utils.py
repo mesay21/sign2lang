@@ -114,3 +114,29 @@ def random_flip(video):
         return video[:, :, ::-1, :]
 
     return video
+
+
+def random_crop(video, label=None, target_size=None):
+    '''Crop rectangular part of a video.
+    Args:
+        video--> 4D array of video frames
+        label--> label of the video
+        target_size--> target size of the frames
+    Retruns:
+        cropped_video--> cropped version of the input video (4D array)     
+    '''
+    _, h, w, _ = video.shape
+    th, tw = target_size
+    video = random_flip(video)
+
+    if (h == th) and (w == tw):
+
+        return video, label
+
+    offset_h = random.randint(0, h - th) if (h != th) else 0
+    offset_w = random.randint(0, w - tw) if (w != tw) else 0
+
+    cropped_video = video[:, offset_h:(
+        offset_h + th), offset_w:(offset_w + tw), :]
+
+    return cropped_video, label
