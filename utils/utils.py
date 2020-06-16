@@ -140,3 +140,24 @@ def random_crop(video, label=None, target_size=None):
         offset_h + th), offset_w:(offset_w + tw), :]
 
     return cropped_video, label
+
+
+def center_crop(video, label=None, target_size=None):
+    '''Crop center part of a video array.
+    Args:
+        video--> 4D array of video frames
+        label--> label of the video
+        target_size--> target size of the frames
+    Retruns:
+        cropped_video--> center cropped input video (4D array)     
+    '''
+    _, h, w, _ = video.shape
+    th, tw = target_size
+
+    offset_h = int((h - th)/2)
+    offset_w = int((w - tw)/2)
+
+    cropped_video = video[:, offset_h:(
+        offset_h + th), offset_w:(offset_w + tw), :]
+
+    return cropped_video, label
