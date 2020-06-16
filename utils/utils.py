@@ -175,3 +175,18 @@ def read_json(json_path):
         data = json.load(fp)
 
     return data
+
+
+def shuffle_data(data, label):
+    '''Randomly shuffle samples in a dataset.
+    Args:
+        data--> a list containing the data
+        label--> a list containing the labels for the data
+    Returns:
+        shuffeled x and y
+    '''
+    dataset = list(zip(data, label))
+    random.shuffle(dataset)
+    data, label = zip(*dataset)
+
+    return data, label
