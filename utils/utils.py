@@ -161,3 +161,17 @@ def center_crop(video, label=None, target_size=None):
         offset_h + th), offset_w:(offset_w + tw), :]
 
     return cropped_video, label
+
+
+def read_json(json_path):
+    ''' Read a JSON file.
+    Args:
+        json_path-->path to JSON file.
+        shuffle--->
+    Returns:
+        data--> Contents of the JSON file
+    '''
+    with open(json_path, 'r+') as fp:
+        data = json.load(fp)
+
+    return data
