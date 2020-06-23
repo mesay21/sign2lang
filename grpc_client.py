@@ -16,7 +16,7 @@ from utils import get_file_list
 from utils import get_random_frames
 from utils import read_video
 
-LABEL_MAP_FILE = 'label_map_100.json'
+LABEL_MAP_FILE = 'data/label_map_100.json'
 
 
 def label_to_word(y):
