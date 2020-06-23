@@ -8,9 +8,7 @@ import tensorflow.keras.backend as B
 import tensorflow.keras as K
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
-from matplotlib import pyplot as plt
 
-from model import Model
 from utils import read_json
 from utils import read_video
 from utils import center_crop
@@ -46,7 +44,11 @@ def evaluate(model_path, file_dir, meta_file):
         average_acc--> average accuracy of the model (float)
     '''
 
-    loaded_model = K.models.load_model(model_path)
+    loaded_model = K.models.load_model(
+        model_path,
+        custom_objects={
+            'B': B
+        })
     test_data, test_label = get_file_list(file_dir, meta_file, file_type='.mp4')
     test_prediction = []
 
@@ -63,9 +65,6 @@ def evaluate(model_path, file_dir, meta_file):
     average_acc = np.sum(per_class_acc) / len(per_class_acc)
     
     return accurcay, average_acc
-
-    
-
 
 if __name__ == "__main__":
     
