@@ -42,8 +42,8 @@ def evaluate(model_path, file_dir, meta_file):
         file_dir --> path to the video files
         meta_file --> meta file containing the test video file names and labels
     Returns:
-        Generates SarveModel format of the
-    
+        accuracy--> overall accuracy of the model (float)
+        average_acc--> average accuracy of the model (float)
     '''
 
     loaded_model = K.models.load_model(model_path)
@@ -60,9 +60,11 @@ def evaluate(model_path, file_dir, meta_file):
     accurcay = accuracy_score(test_label, test_prediction)
     conf_matrix = confusion_matrix(test_label, test_prediction, normalize='pred')
     per_class_acc = np.diag(conf_matrix)
-    average_acc = np.sum(per_class_acc)/len(per_class_acc)
+    average_acc = np.sum(per_class_acc) / len(per_class_acc)
+    
+    return accurcay, average_acc
 
-    print('Accuracy: {:.4} average accuracy: {:.4}'.format(accurcay, average_acc))
+    
 
 
 if __name__ == "__main__":
@@ -76,7 +78,9 @@ if __name__ == "__main__":
         help='Path to meta file')
     
     args = parser.parse_args()
-    evaluate(args.model_dir, args.video_dir, args.meta_file)
+    oa, aa = evaluate(args.model_dir, args.video_dir, args.meta_file)
+    print('Accuracy: {:.4} average accuracy: {:.4}'.format(oa, aa))
+        
     
 
 
