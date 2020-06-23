@@ -98,7 +98,8 @@ def predict(data, server_address):
     Args:
         data--> 4D array of video frames
         server_address--> address of the server where the model is served.
-    
+    Returns:
+        text--> a list of words corresponding to the video input 
     '''
     
     text = []
