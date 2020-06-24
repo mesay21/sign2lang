@@ -6,5 +6,7 @@ Sign2Text is a machine learning model that translates signed videos into text. T
 ## Setup
 
 
-## Initial Commit
+## To do
+
+add test
 
