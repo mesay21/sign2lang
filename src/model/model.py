@@ -9,8 +9,8 @@ import tensorflow.keras as K
 from tensorflow.keras import layers as L
 import tensorflow.keras.backend as B
 
-from i3d_inception import Inception_Inflated3d
-from i3d_inception import conv3d_bn
+from .i3d_inception import Inception_Inflated3d
+from .i3d_inception import conv3d_bn
 
 class Model:
     ''' Load I3D model and attach custom output layer.    
