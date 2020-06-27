@@ -1,5 +1,6 @@
 import os
 import argparse
+import json
 
 import numpy as np
 import tensorflow as tf
@@ -32,19 +33,27 @@ def label_to_word(y):
     return data['{}'.format(y)]
 
 
-def process_response(logits):
-    '''Get the logits response from the model and conevert it to label.
+def process_response(response):
+    '''Get the response from the model, extract logits values and convert it to label.
     Args:
-        logits--> logits response of the model
+        response--> server response for the prediction request
     Returns:
         word--> word corresponding to the class
     '''
+    output = {}
+    logits = response.outputs['lambda'].float_val
+    output['model_info'] = {
+        'name': response.model_spec.name,
+        'version': response.model_spec.version.value}
     prediction_prob = B.softmax(logits)
     label = B.argmax(prediction_prob).numpy()
     word = label_to_word(label)
     prob = prediction_prob[label]
-
-    return word, prob
+    output['result'] = {
+        'word': word,
+        'confidence': prob.numpy()
+    }
+    return output
 
 def grpc_request(data, server_address):
     ''' Send a gRPC request to a server and receive prediction results
@@ -64,11 +73,9 @@ def grpc_request(data, server_address):
     prediction_request.inputs['input_1'].CopyFrom(
         tf.make_tensor_proto(data, shape=data.shape))
 
-    result = stub.Predict(prediction_request)
-    
-    outputs = result.outputs['lambda'].float_val
+    response = stub.Predict(prediction_request)
 
-    return outputs
+    return response
 
 def pre_process_input_data(data, sample=None):
     '''Apply transformation fuctions (normalization, 
@@ -102,40 +109,48 @@ def predict(data, server_address):
         text--> a list of words corresponding to the video input 
     '''
     
-    text = []
+    caption = {}
+    words = []
+    confidence = []
 
     if len(data) < 48:
         data = pre_process_input_data(data)
         response = grpc_request(data, server_address)
-        word, _ = process_response(response)
-        return [word]
+        output = process_response(response)
+        words.append(output['result']['word'])
+        confidence.append(str(output['result']['confidence']))
     
-    start, step, end = 0, 16, 48
-    soft_max_th = 0.09
-    while True:
-        #Check if the number of frames left is less than 16 and drop them
-        if (end - start) < 16:
-            break
-        partial_frames = data[start:end]
-        partial_frames = pre_process_input_data(partial_frames)
-        response = grpc_request(partial_frames, server_address)
-        word, confidence = process_response(response)
-        if confidence > soft_max_th:
-            text.append(word)
-            start = start + 48
-            end = min(len(data), end + 48)
-        
-        #Stop when the all frames are processed
-        if end >= len(data):
-            if len(text) == 0 :
-                text.append('Unknown word')
-            break
+    else:
+        start, step, end = 0, 16, 48
+        soft_max_th = 0.09
+        while True:
+            #Check if the number of frames left is less than 16 and drop them
+            if (end - start) < 16:
+                break
+            partial_frames = data[start:end]
+            partial_frames = pre_process_input_data(partial_frames)
+            response = grpc_request(partial_frames, server_address)
+            output = process_response(response)
+            if output['result']['confidence'] > soft_max_th:
+                words.append(output['result']['word'])
+                confidence.append(str(output['result']['confidence']))
+                start = start + 48
+                end = min(len(data), end + 48)
+            else:
+                # Add more frames if confidence is less than the threshold
+                end = min(len(data), end + step)
+            #Stop when the all frames are processed
+            if end >= len(data):
+                if len(words) == 0 :
+                    words.append('Unknown word')
+                break
+    
+    caption['words'] = words
+    caption['confidence'] = confidence
+    caption['model_info'] = output['model_info']
+    caption = json.dumps(caption)           
 
-        # Add more frames if confidence is less than the threshold
-        if confidence <= soft_max_th:
-            end = min(len(data), end + step)
-
-    return text
+    return caption
 
 if __name__ == '__main__':
 
@@ -156,7 +171,7 @@ if __name__ == '__main__':
     server_addr = '{}:{}'.format(args.ip_addr, args.port)
 
     text = predict(video, server_addr)
-    print(' '.join(text))
+    print(text)
 
 
 
