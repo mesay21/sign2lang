@@ -73,7 +73,11 @@ def grpc_request(data, server_address):
     prediction_request.inputs['input_1'].CopyFrom(
         tf.make_tensor_proto(data, shape=data.shape))
 
-    response = stub.Predict(prediction_request)
+    try:
+        response = stub.Predict(prediction_request, 10) # wait 10 seconds
+    except grpc.RpcError as e:
+        print('gRPC error \nError code: {} \nDetails: {}'.format(e.code().name, e.details()))
+        exit()
 
     return response
 
@@ -170,8 +174,8 @@ if __name__ == '__main__':
 
     server_addr = '{}:{}'.format(args.ip_addr, args.port)
 
-    text = predict(video, server_addr)
-    print(text)
+    response = predict(video, server_addr)
+    print(response)
 
 
 
