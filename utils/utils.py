@@ -5,6 +5,10 @@ import random
 import cv2
 import numpy as np
 import tensorflow as tf
+import yaml
+
+with open('configs/config.yml') as fp:
+    config_data = yaml.load(fp, yaml.FullLoader)
 
 
 def parse_example(example_proto, features):
@@ -27,8 +31,9 @@ def decode_image(encoded_image):
         image--> JPEG decoded image tensor
     '''
     img = tf.io.decode_jpeg(encoded_image)
-    img.set_shape((256, 256, 3))
-    return decode_image
+    img.set_shape((config_data.get('CROP_HEIGHT'),
+                   config_data.get('CROP_WIDTH'), config_data.get('CHANNELS')))
+    return img
 
 
 def normalize(image):
@@ -74,7 +79,7 @@ def parse_video(example_proto):
     return video
 
 
-def get_random_frames(frames, num_classes, label=None, num_frames=20):
+def get_random_frames(frames, label, num_frames=20):
     '''Given a numpy array for a video frame, sample frames 
         without loosing temporal sequence.
     Args:
@@ -86,6 +91,10 @@ def get_random_frames(frames, num_classes, label=None, num_frames=20):
         sampled_frames--> 4D array frames
         label--> one-hot encoded label of the video
     '''
+
+    onehot_label = tf.one_hot(label, config_data.get(
+        'NUM_CLASSES'), dtype=tf.float32)
+
     if (len(frames) < num_frames):
         # If the number of frames is less than the required number of frames,
         # append frames with zero values.
@@ -94,13 +103,13 @@ def get_random_frames(frames, num_classes, label=None, num_frames=20):
         frames = np.concatenate((frames, zeros_array), axis=0)
         assert len(frames) == num_frames
 
-        return frames, tf.one_hot(label, num_classes, dtype=tf.float32)
+        return frames, onehot_label
 
     rate = len(frames)//num_frames
     index = np.arange(0, len(frames), rate)
     sampled_frames = np.stack([frames[i] for i in index[:num_frames]], axis=0)
     
-    return sampled_frames, tf.one_hot(label, num_classes, dtype=tf.float32)
+    return sampled_frames, onehot_label
 
 
 def random_flip(video):
@@ -127,6 +136,7 @@ def random_crop(video, label=None, target_size=None):
     '''
     _, h, w, _ = video.shape
     th, tw = target_size
+    
     video = random_flip(video)
 
     if (h == th) and (w == tw):
@@ -222,7 +232,11 @@ def get_file_list(file_path, meta_file, file_type='.tfrecords'):
     return data, label
 
 
-def read_video(video_path, dim=(256, 256)):
+def read_video(
+    video_path,
+    dim=(config_data.get('CROP_HEIGHT'),
+    config_data.get('CROP_WIDTH'))
+    ):
     ''' Read a video file from a given path and return it as a numpy array.
     Args:
         video_path--> path to the video file (string)
