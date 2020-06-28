@@ -1,4 +1,11 @@
 # To install these Python dependencies, please type:
 # pip install -r requirements.txt
 
-streamlit
+tensorflow-gpu==2.2.0
+opencv-python-headless==4.2.0.*
+tqdm
+grpcio
+PyYAML
+wandb
+tensorflow-serving-api
+scikit-learn
