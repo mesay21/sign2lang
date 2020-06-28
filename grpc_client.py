@@ -9,6 +9,7 @@ import tensorflow.keras.backend as B
 import grpc
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
+import yaml
 
 from utils import read_json
 from utils import center_crop
@@ -18,6 +19,9 @@ from utils import get_random_frames
 from utils import read_video
 
 LABEL_MAP_FILE = 'data/label_map_100.json'
+
+with open('configs/config.yml') as fp:
+    config = yaml.load(fp, yaml.FullLoader)
 
 
 def label_to_word(y):
@@ -98,7 +102,7 @@ def pre_process_input_data(data, sample=None):
     if sample is not None:
         data, _ = get_random_frames(data, label=0, num_frames=sample)
     
-    data, _ = center_crop(data, target_size=(224, 224))
+    data, _ = center_crop(data, target_size=(config.get('HEIGHT'), config.get('WIDTH')))
     data = np.expand_dims(data, axis=0)
 
     return data.astype(np.float32)
@@ -117,7 +121,7 @@ def predict(data, server_address):
     words = []
     confidence = []
 
-    if len(data) < 48:
+    if len(data) < config.get('INIT_NUM_FRAMES'):
         data = pre_process_input_data(data)
         response = grpc_request(data, server_address)
         output = process_response(response)
@@ -125,25 +129,29 @@ def predict(data, server_address):
         confidence.append(str(output['result']['confidence']))
     
     else:
-        start, step, end = 0, 16, 48
-        soft_max_th = 0.09
+        start = 0
+        step = config.get('STEP_SIZE')
+        end = config.get('INIT_NUM_FRAMES')
         while True:
             #Check if the number of frames left is less than 16 and drop them
-            if (end - start) < 16:
+            if (end - start) < step:
                 break
+            
             partial_frames = data[start:end]
             partial_frames = pre_process_input_data(partial_frames)
             response = grpc_request(partial_frames, server_address)
             output = process_response(response)
-            if output['result']['confidence'] > soft_max_th:
+            
+            if output['result']['confidence'] > config.get('SOFT_MAX_TH'):
                 words.append(output['result']['word'])
                 confidence.append(str(output['result']['confidence']))
-                start = start + 48
-                end = min(len(data), end + 48)
+                start = start + config.get('INIT_NUM_FRAMES')
+                end = min(len(data), end + config.get('INIT_NUM_FRAMES'))
             else:
                 # Add more frames if confidence is less than the threshold
                 end = min(len(data), end + step)
             #Stop when the all frames are processed
+            
             if end >= len(data):
                 if len(words) == 0 :
                     words.append('Unknown word')
@@ -171,6 +179,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     video = read_video(args.video_path)
+
+    if len(video) < config.get('STEP_SIZE'):
+        print('Insufficinet number of frames in the video.\n\
+        Please upload another video.' )
+        exit()
 
     server_addr = '{}:{}'.format(args.ip_addr, args.port)
 
