@@ -9,28 +9,30 @@ import tensorflow as tf
 from tensorflow import keras as K
 import wandb
 from wandb.keras import WandbCallback
+import yaml
 
 # from model import Model
 from src.model import Model
 from utils import *
 
+with open('configs/config.yml') as fp:
+    config_data = yaml.load(fp, yaml.FullLoader)
+
 hyperparameter_defaults = dict(
-    dropout = 0.5,
-    num_frames = 16,
-    batch_size = 64,
-    learning_rate = 0.001,
-    epochs = 100,
-    depth = 0,
+    dropout=config_data.get('dropout'),
+    num_frames=config_data.get('num_frames'),
+    batch_size=config_data.get('batch_size'),
+    learning_rate=config_data.get('learning_rate'),
+    epochs=config_data.get('epochs'),
+    depth=config_data.get('depth'),
     )
 
-wandb.init(entity="mesay-b", project="sign2text", config=hyperparameter_defaults)
+wandb.init(
+    entity=config_data.get('entity'),
+    project=config_data.get('project'),
+    config=hyperparameter_defaults)
+
 config = wandb.config
-
-NUM_CLASSES = 100
-HEIGHT = 224
-WIDTH = 224
-CHANNELS = 3
-
 
 def input_pipeline(file_path, meta_file, training=False):
     '''Create training input pipline using tf.data API
@@ -41,7 +43,7 @@ def input_pipeline(file_path, meta_file, training=False):
     Returns:
         
     '''
-    crop_size = [HEIGHT, WIDTH]
+    crop_size = [config_data.get('HEIGHT'), config_data.get('WIDTH')]
     #Get filenames and labels
     file_list, label_list = get_file_list(file_path, meta_file)
 
@@ -88,9 +90,11 @@ def train(log_dir, dataset_dir):
     val_dir = os.path.join(dataset_dir, 'validation')
 
     train_meta = os.path.join(
-        dataset_dir, 'wlasl_{}/train_{}.json'.format(NUM_CLASSES, NUM_CLASSES))
+        dataset_dir, 'wlasl_{}/train_{}.json'.format(
+            config_data.get('NUM_CLASSES'), config_data.get('NUM_CLASSES')))
     val_meta = os.path.join(
-        dataset_dir, 'wlasl_{}/val_{}.json'.format(NUM_CLASSES,  NUM_CLASSES))
+        dataset_dir, 'wlasl_{}/val_{}.json'.format(
+            config_data.get('NUM_CLASSES'),  config_data.get('NUM_CLASSES')))
 
 
     train = input_pipeline(train_dir, train_meta, training=True)
@@ -112,11 +116,11 @@ def train(log_dir, dataset_dir):
     with strategy.scope():
         
         network = Model(
-            num_channels=CHANNELS,
-            num_classes=NUM_CLASSES,
+            num_channels=config_data.get('CHANNELS'),
+            num_classes=config_data.get('NUM_CLASSES'),
             num_frames=config.num_frames,
-            frame_height=HEIGHT,
-            frame_width=WIDTH,
+            frame_height=config_data.get('HEIGHT'),
+            frame_width=config_data.get('WIDTH'),
             dropout_prob=config.dropout)
         
         model = network.network(depth=config.depth)
