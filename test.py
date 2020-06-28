@@ -7,13 +7,20 @@ import tensorflow as tf
 import tensorflow.keras.backend as B
 import tensorflow.keras as K
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import classification_report
+import yaml
 
 from utils import read_json
 from utils import read_video
 from utils import center_crop
 from utils import get_file_list
 from utils import normalize
+
+
+LABEL_MAP_FILE = 'data/label_map_100.json'
+
+with open('configs/config.yml') as fp:
+    config_data = yaml.load(fp, yaml.FullLoader)
 
 def get_pridiction(model, data):
     '''Pridict labels using keras model.predict method.
@@ -40,8 +47,8 @@ def evaluate(model_path, file_dir, meta_file):
         file_dir --> path to the video files
         meta_file --> meta file containing the test video file names and labels
     Returns:
-        accuracy--> overall accuracy of the model (float)
-        average_acc--> average accuracy of the model (float)
+        report--> returns a text report showing main classification metrics using
+                scikit-learn classification report method
     '''
 
     loaded_model = K.models.load_model(
@@ -55,16 +62,18 @@ def evaluate(model_path, file_dir, meta_file):
     for x, y in zip(test_data, test_label):
         video = read_video(x)
         video = normalize(video)
-        video, _ = center_crop(video, target_size=(224, 224))
+        video, _ = center_crop(video, target_size=(
+            config_data.get('HEIGHT'), config_data.get('WIDTH')))
         prob = get_pridiction(loaded_model, video)
         test_prediction.append(prob[0])
     
-    accurcay = accuracy_score(test_label, test_prediction)
-    conf_matrix = confusion_matrix(test_label, test_prediction, normalize='pred')
-    per_class_acc = np.diag(conf_matrix)
-    average_acc = np.sum(per_class_acc) / len(per_class_acc)
+    label_map = read_json(LABEL_MAP_FILE)
+    vocabulary = [label_map.get(str(i)) for i in range(config_data.get('NUM_CLASSES'))]
+    report = classification_report(
+        test_label, test_prediction,
+        target_names=vocabulary, zero_division=1)
     
-    return accurcay, average_acc
+    return report
 
 if __name__ == "__main__":
     
@@ -77,8 +86,8 @@ if __name__ == "__main__":
         help='Path to meta file')
     
     args = parser.parse_args()
-    oa, aa = evaluate(args.model_dir, args.video_dir, args.meta_file)
-    print('Accuracy: {:.4} average accuracy: {:.4}'.format(oa, aa))
+    report = evaluate(args.model_dir, args.video_dir, args.meta_file)
+    print(report)
         
     
 
