@@ -1,0 +1,29 @@
+# wandb init values -------------------------------------------------
+#
+entity: ""
+project: ""
+
+# Training Hyperparams --------------------------------------
+
+batch_size: 8
+epochs: 200
+dropout: 0.3
+num_frames: 16
+learning_rate: 0.001
+depth: 0 #
+
+# data related parameters
+
+HEIGHT: 224
+WIDTH: 224
+CHANNELS: 3
+NUM_CLASSES: 100
+
+CROP_HEIGHT: 256
+CROP_WIDTH: 256
+
+# Prediction related parameters
+
+SOFT_MAX_TH: 0.09
+INIT_NUM_FRAMES: 48
+STEP_SIZE: 16
