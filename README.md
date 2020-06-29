@@ -77,7 +77,7 @@ $ python convert_to_tfrecords.py --help
 
 **dataset/wlasl_num-classes**: directory containing JSON files related to the training, validation, and test files.  
     The JSON files contain information such as video file name, numrical and gloss label of the video file and other information.
-    You can find these files in the **data/meta-data** directory.  
+    You can find these files in the **data/meta-data** directory. 
     *num-classes* the number of classes to which the files belong.  
     For example, **wlasl_100** refers too a directory containing JSON files corresponding to the top 100 classes from the original dataset.
 
