@@ -59,12 +59,14 @@ from data/sample_videos directory
 ```sh
     $ python convert_to_tfrecords.py --help
 ```
-3. The train.py module expects the dataset directory to be structured as follows  
+3. The train.py module expects the dataset directory to be structured as follows
+```bash  
     |--- dataset  
-         |--- train   
-         |--- validation  
-         |--- test  
-         |--- wlasl_<num-classes>  
+            |--- train   
+            |--- validation  
+            |--- test  
+            |--- wlasl_<num-classes>  
+```
     dataset/train : directory containing training tfrecord files
     dataset/validation: directory containing validation tfrecord files 
     dataset/test: directory containing test video files
