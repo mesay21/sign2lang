@@ -35,11 +35,11 @@ Sign2Text requires Python 3 to run.
 	$ pip install -r requirements.txt
 ```
 3. Install [Docker](https://docs.docker.com/get-docker/) to use the deployed model.
-    * Get the docker image containing the model from docker hub
+* Get the docker image containing the model from docker hub
 ```sh
     $ docker pull mesayb/sign2text
 ```
-    * Start sign2text container and open a gRPC port with the following command
+* Start sign2text container and open a gRPC port with the following command
 ```sh
     $ docker run -d -p <port-number>:8500 --name sign2text mesayb/sign2text
 ```
@@ -60,11 +60,11 @@ from data/sample_videos directory
     $ python convert_to_tfrecords.py --help
 ```
 3. The train.py module expects the dataset directory to be structured as follows  
-    |--- dataset
-         |--- train 
-         |--- validation
-         |--- test
-         |--- wlasl_<num-classes>
+    |--- dataset  
+         |--- train   
+         |--- validation  
+         |--- test  
+         |--- wlasl_<num-classes>  
     dataset/train : directory containing training tfrecord files
     dataset/validation: directory containing validation tfrecord files 
     dataset/test: directory containing test video files
