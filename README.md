@@ -83,8 +83,9 @@ $ python convert_to_tfrecords.py --help
 ```sh
 $ python train.py --log_dir <log-directory> --dataset_dir <dataset-directory>
 ```
-<log-directory>: directory where training checkpoint and model are saved
-<dataset-directory>: directory where the dataset is saved (as structured above)
+
+    <log-directory>: directory where training checkpoint and model are saved  
+    <dataset-directory>: directory where the dataset is saved (as structured above)
 
 6. Generate performance report on the test samples using the test.py module.  You can use your trained model or there is
 a saved model in the data/weights folder to run the test.  Run the following command to see usage instructions
@@ -94,7 +95,7 @@ $ python convert_to_tfrecords.py --help
 
 ## To do
 
-add activation visualization module
+add activation visualization module  
 add test
 
 
