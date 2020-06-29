@@ -22,8 +22,9 @@ Sign2Text requires Python 3 to run.
 ```sh
 $ git clone https://github.com/mesay21/sign2text.git
 ```
-2. I recommend to install [Anconda](https://www.anaconda.com/products/individual)  
-for package managment and run the environment.yml file to create an environment named sign-to-text.  Run the following command:
+2. I recommend to install [Anconda](https://www.anaconda.com/products/individual) for package managment and  
+run the environment.yml file to create an environment named sign-to-text.  Run the following command:
+
 ```sh
 $ conda env create -f environment.yml
 ```
@@ -68,9 +69,12 @@ $ python convert_to_tfrecords.py --help
     |--- test  
     |--- wlasl_<num-classes>  
 ```
-**dataset/train** : directory containing training tfrecord files
-**dataset/validation**: directory containing validation tfrecord files 
-**dataset/test**: directory containing test video files
+**dataset/train** : directory containing training tfrecord files  
+
+**dataset/validation**: directory containing validation tfrecord files  
+
+**dataset/test**: directory containing test video files  
+
 **dataset/wlasl_num-classes**: directory containing JSON files related to the training, validation, and test files.  
     The JSON files contain information such as video file name, numrical and gloss label of the video file and other information.
     You can find these files in the **data/meta-data** directory.  
