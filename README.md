@@ -46,7 +46,7 @@ $ docker pull mesayb/sign2text
 $ docker run -d -p <port-number>:8500 --name sign2text mesayb/sign2text
 ```
 Now the docker named **sign2text** is runnng at IP address **0.0.0.0** and port **port-number**
-*
+
 4. Test the docker image by running a sample prediction request using the video files  
 from **data/sample_videos** directory
 ```sh
