@@ -71,9 +71,9 @@ from data/sample_videos directory
     dataset/validation: directory containing validation tfrecord files 
     dataset/test: directory containing test video files
     dataset/wlasl_<num-classes>: directory containing JSON files related to the training, validation, and test files.  
-    The JSON files contain information such as video file name, numrical and gloss label of the video file and other information.
-    You can find these files in the data/meta-data directory. <num-classes> the number of classes to which the files belong.  
-    For example, wlasl_100 refers too a directory containing JSON files corresponding to the top 100 classes from the original dataset.
+        The JSON files contain information such as video file name, numrical and gloss label of the video file and other information.
+        You can find these files in the data/meta-data directory. <num-classes> the number of classes to which the files belong.  
+        For example, wlasl_100 refers too a directory containing JSON files corresponding to the top 100 classes from the original dataset.
 
 4. I recommend to use [weights and biases](https://www.wandb.com/) to track the training. Create a free account, create a project, and add your
     account name and project name in the configs/config.yml file in the section "wandb init values".  
