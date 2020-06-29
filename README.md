@@ -20,35 +20,35 @@ Sign2Text is a machine learning model that translates signed videos into text.
 Sign2Text requires Python 3 to run. 
 1. Clone the repository
 ```sh
-	$ git clone https://github.com/mesay21/sign2text.git
+$ git clone https://github.com/mesay21/sign2text.git
 ```
 2. I recommend to install [Anconda](https://www.anaconda.com/products/	individual) for package managment and run 	the environment.yml file to create an environment named sign-to-text. 	Run the following command:
 ```sh
-	$ conda env create -f environment.yml
+$ conda env create -f environment.yml
 ```
-    * Activate the environment using 
+* Activate the environment using 
 ```sh 
-	$ conda activate sign-to-text
+$ conda activate sign-to-text
 ```
     * Install all the dependencies inside the environment
 ```sh
-	$ pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 3. Install [Docker](https://docs.docker.com/get-docker/) to use the deployed model.
 * Get the docker image containing the model from docker hub
 ```sh
-    $ docker pull mesayb/sign2text
+$ docker pull mesayb/sign2text
 ```
 * Start sign2text container and open a gRPC port with the following command
 ```sh
-    $ docker run -d -p <port-number>:8500 --name sign2text mesayb/sign2text
+$ docker run -d -p <port-number>:8500 --name sign2text mesayb/sign2text
 ```
 Now the docker named sign2text is runnng at IP address 0.0.0.0 and port <port-number>
 
 4. Test the docker image by running a sample prediction request using the video files  
 from data/sample_videos directory
 ```sh
-    $ python grpc_client.py --video_path data/sample_videos/<video-name> --ip_addr 0.0.0.0 --port <port-number>
+$ python grpc_client.py --video_path data/sample_videos/<video-name> --ip_addr 0.0.0.0 --port <port-number>
 ```
 ### Training your own sign2text model
     
@@ -57,15 +57,15 @@ from data/sample_videos directory
     Convert the videos into TFrecord format using the conver_to_tfrecord.py file.  Run the following command to see 
     instructions on how to use the file.
 ```sh
-    $ python convert_to_tfrecords.py --help
+$ python convert_to_tfrecords.py --help
 ```
 3. The train.py module expects the dataset directory to be structured as follows
 ```bash  
-    |--- dataset  
-            |--- train   
-            |--- validation  
-            |--- test  
-            |--- wlasl_<num-classes>  
+|--- dataset  
+        |--- train   
+        |--- validation  
+        |--- test  
+        |--- wlasl_<num-classes>  
 ```
     dataset/train : directory containing training tfrecord files
     dataset/validation: directory containing validation tfrecord files 
@@ -81,15 +81,15 @@ from data/sample_videos directory
 
 5. Run the train.py file to train your model
 ```sh
-    $ python train.py --log_dir <log-directory> --dataset_dir <dataset-directory>
+$ python train.py --log_dir <log-directory> --dataset_dir <dataset-directory>
 ```
-    <log-directory>: directory where training checkpoint and model are saved
-    <dataset-directory>: directory where the dataset is saved (as structured above)
+<log-directory>: directory where training checkpoint and model are saved
+<dataset-directory>: directory where the dataset is saved (as structured above)
 
 6. Generate performance report on the test samples using the test.py module.  You can use your trained model or there is
 a saved model in the data/weights folder to run the test.  Run the following command to see usage instructions
 ```sh
-    $ python convert_to_tfrecords.py --help
+$ python convert_to_tfrecords.py --help
 ```
 
 ## To do
