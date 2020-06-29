@@ -7,7 +7,7 @@ Sign2Text is a machine learning model that translates signed videos into text.
 * Transfer learning is applied to fine-tune the pre-trained model on the [WLASL](https://github.com/dxli94/WLASL) dataset. 
 
 * The final product is a trained model deployed in a docker image using Tensorflow serving and an API
-	to communicate with the image for inferece.
+	to communicate with the image for inference.
 
 ## Features
 
@@ -22,7 +22,8 @@ Sign2Text requires Python 3 to run.
 ```sh
 $ git clone https://github.com/mesay21/sign2text.git
 ```
-2. I recommend to install [Anconda](https://www.anaconda.com/products/	individual) for package managment and run 	the environment.yml file to create an environment named sign-to-text. 	Run the following command:
+2. I recommend to install [Anconda](https://www.anaconda.com/products/individual)  
+for package managment and run the environment.yml file to create an environment named sign-to-text.  Run the following command:
 ```sh
 $ conda env create -f environment.yml
 ```
